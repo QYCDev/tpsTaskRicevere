@@ -1,5 +1,5 @@
 /*
-cron "40 9 * * *" DailyCheck.js, tag=每日签到合集
+cron "40 23 * * *" tpsRicevere.js, tag=战令领取
 */
 const yaml = require("js-yaml");
 const fs = require('fs');
