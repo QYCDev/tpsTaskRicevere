@@ -3,7 +3,6 @@ cron "40 23 * * *" tpsRicevere.js, tag=战令领取
 */
 const yaml = require("js-yaml");
 const fs = require('fs');
-const task = require('./scripts/tps.js');
 let QL = process.env.QL_DIR
 config = null, notify = null, signlist = [], logs = "", needPush = false
 if (fs.existsSync("./sendNotify.js")) notify = require('./sendNotify')
@@ -24,6 +23,7 @@ async function go() {
 function start() {
     return new Promise(async (resolve) => {
         try {
+            const task = require('./scripts/tps.js');
             taskResult = await task()
             if (taskResult && taskResult.match(/单独通知|cookie|失效|失败|出错|重新登录/)) await sendmsg(taskResult)
             else logs += taskResult + "    \n\n";

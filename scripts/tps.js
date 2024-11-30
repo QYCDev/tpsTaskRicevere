@@ -45,7 +45,6 @@ async function getTask(flowId, task, taskId) {
   const randomTag = generateRandomString();
   // POST 请求的数据
   const postData = `sServiceType=tps&iActivityId=669689&sServiceDepartment=group_a&iFlowId=${flowId}&g_tk=1842395457&sMiloTag=AMS-tps-1201012751-${randomTag}-669689-1071393&e_code=544437&g_code=0&eas_url=https%253A%252F%252Ftps.qq.com%252Fcp%252Fa20240914yyhd%252Findex.html%253Fe_code%253D544437&eas_refer=https%253A%252F%252Ftps.qq.com%252Fcp%252Fa20240914yyhd%252Findex.html%253Fe_code%253D544437&${task}=${taskId}`;
-  console.log(postData)
   const response = await axios.post(url, postData, {
     headers: {
       'User-Agent': agent,
