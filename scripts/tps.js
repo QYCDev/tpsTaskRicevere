@@ -74,4 +74,7 @@ function generateRandomString(length = 6) {
     }
     return result;
 }
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 module.exports = tps;
