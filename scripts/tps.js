@@ -16,7 +16,8 @@ function tps() {
       taskRicevereArray = config.tps.taskRicevere.split("&");
       for (let i = 0; i < taskRicevereArray.length; i++){
         const taskRicevere = taskRicevereArray[i];
-        await getTask(iFlowId, 'taskRicevere', taskRicevere)
+        await getTask(iFlowId, 'taskRicevere', taskRicevere);
+        await wait(500);
       }
 
       // 开始领取周常任务
@@ -24,7 +25,8 @@ function tps() {
       taskRicevereArray = config.tps.taskRicevereWeek.split("&");
       for (let i = 0; i < taskRicevereArray.length; i++){
         const taskRicevere = taskRicevereArray[i];
-        await getTask(iFlowId, 'taskRicevereWeek', taskRicevere)
+        await getTask(iFlowId, 'taskRicevereWeek', taskRicevere);
+        await wait(500);
       }
 
       // 开始领取挑战任务
@@ -32,7 +34,8 @@ function tps() {
       taskRicevereArray = config.tps.taskRicevereTz.split("&");
       for (let i = 0; i < taskRicevereArray.length; i++){
         const taskRicevere = taskRicevereArray[i];
-        await getTask(iFlowId, 'taskRicevereTz', taskRicevere)
+        await getTask(iFlowId, 'taskRicevereTz', taskRicevere);
+        await wait(500);
       }
     } catch (error) {
       msg =`领取失败，原因：${error.message}`;
