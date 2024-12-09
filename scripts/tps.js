@@ -17,7 +17,7 @@ function tps() {
       for (let i = 0; i < taskRicevereArray.length; i++){
         const taskRicevere = taskRicevereArray[i];
         await getTask(iFlowId, 'taskRicevere', taskRicevere);
-        await wait(500);
+        await wait(2000);
       }
 
       // 开始领取周常任务
@@ -26,7 +26,7 @@ function tps() {
       for (let i = 0; i < taskRicevereArray.length; i++){
         const taskRicevere = taskRicevereArray[i];
         await getTask(iFlowId, 'taskRicevereWeek', taskRicevere);
-        await wait(500);
+        await wait(2000);
       }
 
       // 开始领取挑战任务
@@ -35,7 +35,7 @@ function tps() {
       for (let i = 0; i < taskRicevereArray.length; i++){
         const taskRicevere = taskRicevereArray[i];
         await getTask(iFlowId, 'taskRicevereTz', taskRicevere);
-        await wait(500);
+        await wait(2000);
       }
     } catch (error) {
       msg =`领取失败，原因：${error.message}`;
