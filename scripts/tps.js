@@ -2,10 +2,14 @@ const axios = require("axios");
 
 const token = config.tps.Cookie;
 const agent = config.UserAgent;
+var iActivityId = config.tps.iActivityId;
 var iFlowId = config.tps.iFlowId;
+var sSDID = config.tps.sSDID;
+var e_code = config.tps.ecode;
+var eas_url = config.tps.easurl;
 var taskRicevereArray = [];
 // 请求的 URL
-const url = 'https://comm.ams.game.qq.com/ams/ame/amesvr?sServiceType=tps&iActivityId=669689&sServiceDepartment=group_a&sSDID=9d279000b652819bcaf1fb64898a079c';
+const url = `https://comm.ams.game.qq.com/ams/ame/amesvr?sServiceType=tps&iActivityId=${iActivityId}&sServiceDepartment=group_a&sSDID=${sSDID}`;
 
 function tps() { 
   return new Promise(async (resolve) => {
@@ -47,7 +51,7 @@ function tps() {
 async function getTask(flowId, task, taskId) {
   const randomTag = generateRandomString();
   // POST 请求的数据
-  const postData = `sServiceType=tps&iActivityId=669689&sServiceDepartment=group_a&iFlowId=${flowId}&g_tk=1842395457&sMiloTag=AMS-tps-1201012751-${randomTag}-669689-${flowId}&e_code=544437&g_code=0&eas_url=https%253A%252F%252Ftps.qq.com%252Fcp%252Fa20240914yyhd%252Findex.html%253Fe_code%253D544437&eas_refer=https%253A%252F%252Ftps.qq.com%252Fcp%252Fa20240914yyhd%252Findex.html%253Fe_code%253D544437&${task}=${taskId}`;
+  const postData = `sServiceType=tps&iActivityId=${iActivityId}&sServiceDepartment=group_a&iFlowId=${flowId}&g_tk=1842395457&sMiloTag=AMS-tps-1219120114-${randomTag}-${iActivityId}-${flowId}&e_code=${e_code}&g_code=0&eas_url=${eas_url}&eas_refer=${eas_url}&${task}=${taskId}`;
   const response = await axios.post(url, postData, {
     headers: {
       'User-Agent': agent,
