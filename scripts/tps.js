@@ -1,75 +1,17 @@
 const axios = require("axios");
 
-const token = config.tps.Cookie;
-const agent = config.UserAgent;
-var iActivityId = config.tps.iActivityId;
-var iFlowId = config.tps.iFlowId;
-var sSDID = config.tps.sSDID;
-var e_code = config.tps.ecode;
-var eas_url = config.tps.easurl;
-var taskRicevereArray = [];
-// 请求的 URL
-const url = `https://comm.ams.game.qq.com/ams/ame/amesvr?sServiceType=tps&iActivityId=${iActivityId}&sServiceDepartment=group_a&sSDID=${sSDID}`;
-
-function tps() { 
-  return new Promise(async (resolve) => {
-    try {
-      msg = '开始领取战令奖励\n'
-      // 开始领取日常任务
-      iFlowId = config.tps.iFlowId;
-      taskRicevereArray = config.tps.taskRicevere.split("&");
-      for (let i = 0; i < taskRicevereArray.length; i++){
-        const taskRicevere = taskRicevereArray[i];
-        await getTask(iFlowId, 'taskRicevere', taskRicevere);
-        await wait(2000);
-      }
-
-      // 开始领取周常任务
-      iFlowId = config.tps.iFlowIdWeek;
-      taskRicevereArray = config.tps.taskRicevereWeek.split("&");
-      for (let i = 0; i < taskRicevereArray.length; i++){
-        const taskRicevere = taskRicevereArray[i];
-        await getTask(iFlowId, 'taskRicevereWeek', taskRicevere);
-        await wait(2000);
-      }
-
-      // 开始领取挑战任务
-      iFlowId = config.tps.iFlowIdTz;
-      taskRicevereArray = config.tps.taskRicevereTz.split("&");
-      for (let i = 0; i < taskRicevereArray.length; i++){
-        const taskRicevere = taskRicevereArray[i];
-        await getTask(iFlowId, 'taskRicevereTz', taskRicevere);
-        await wait(2000);
-      }
-    } catch (error) {
-      msg =`领取失败，原因：${error.message}`;
-    }
-    console.log(msg)
-    resolve("【tps战令】：" + msg);
-  });
+// 封装配置读取和请求 URL 生成
+function getConfig() {
+    const agent = config.UserAgent;
+    const iActivityId = config.tps.iActivityId;
+    const sSDID = config.tps.sSDID;
+    const e_code = config.tps.ecode;
+    const eas_url = config.tps.easurl;
+    const url = `https://comm.ams.game.qq.com/ams/ame/amesvr?sServiceType=tps&iActivityId=${iActivityId}&sServiceDepartment=group_a&sSDID=${sSDID}`;
+    return { agent, iActivityId, sSDID, e_code, eas_url, url };
 }
-async function getTask(flowId, task, taskId) {
-  const randomTag = generateRandomString();
-  // POST 请求的数据
-  const postData = `sServiceType=tps&iActivityId=${iActivityId}&sServiceDepartment=group_a&iFlowId=${flowId}&g_tk=1842395457&sMiloTag=AMS-tps-1219120114-${randomTag}-${iActivityId}-${flowId}&e_code=${e_code}&g_code=0&eas_url=${eas_url}&eas_refer=${eas_url}&${task}=${taskId}`;
-  const response = await axios.post(url, postData, {
-    headers: {
-      'User-Agent': agent,
-      Cookie: token,
-      'referer': 'https://tps.qq.com/'
-     },
-   });
-  if (response.status == 200) {
-    if(response.data.ret == "0"){
-      msg += `${task}${taskId}领取成功\n`;
-    } else {
-      msg += `${task}${taskId}领取失败,原因：${response.data.msg}\n`;
-    }
-  } else {
-    msg += `${task}${taskId}领取失败\n`;
-  }
-}
-// 生成随机 6 位英文字母的函数
+
+// 生成随机字符串
 function generateRandomString(length = 6) {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     let result = '';
@@ -78,7 +20,63 @@ function generateRandomString(length = 6) {
     }
     return result;
 }
-function wait(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+
+// 封装任务请求逻辑
+async function getTask({ flowId, task, taskId, token, agent, url, e_code, eas_url }) {
+    const randomTag = generateRandomString();
+    const postData = `sServiceType=tps&iActivityId=${config.tps.iActivityId}&sServiceDepartment=group_a&iFlowId=${flowId}&g_tk=1842395457&sMiloTag=AMS-tps-1219120114-${randomTag}-${config.tps.iActivityId}-${flowId}&e_code=${e_code}&g_code=0&eas_url=${eas_url}&eas_refer=${eas_url}&${task}=${taskId}`;
+    try {
+        const response = await axios.post(url, postData, {
+            headers: {
+                'User-Agent': agent,
+                Cookie: token,
+                'referer': 'https://tps.qq.com/'
+            },
+        });
+        if (response.status === 200) {
+            return response.data.ret === "0"
+               ? `${task}${taskId}领取成功\n`
+                : `${task}${taskId}领取失败,原因：${response.data.msg}\n`;
+        }
+        return `${task}${taskId}领取失败\n`;
+    } catch (error) {
+        return `${task}${taskId}领取失败，原因：${error.message}\n`;
+    }
 }
+
+// 执行单个用户的任务
+async function executeUserTasks(cookie, configData) {
+    let msg = '开始领取战令奖励\n';
+    const taskTypes = [
+        { id: 'taskRicevere', flowId: config.tps.iFlowId, tasks: config.tps.taskRicevere.split("&") },
+        { id: 'taskRicevereWeek', flowId: config.tps.iFlowIdWeek, tasks: config.tps.taskRicevereWeek.split("&") },
+        { id: 'taskRicevereTz', flowId: config.tps.iFlowIdTz, tasks: config.tps.taskRicevereTz.split("&") }
+    ];
+
+    for (const { id, flowId, tasks } of taskTypes) {
+        for (const taskId of tasks) {
+            const result = await getTask({ ...configData, flowId, task: id, taskId, token: cookie });
+            msg += result;
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+    }
+    return msg;
+}
+
+// 主函数，处理多个用户
+async function tps() {
+    const cookies = config.tps.cookies;
+    const configData = getConfig();
+    let allMessages = '';
+
+    for (let i = 0; i < cookies.length; i++) {
+        console.log("开始领取用户 ${i + 1} 的战令奖励");
+        const cookie = cookies[i];
+        const userMsg = await executeUserTasks(cookie, configData);
+        console.log(userMsg);
+        allMessages += `【用户 ${i + 1}】：` + userMsg + '\n';
+    }
+    return "【tps战令】：" + allMessages;
+}
+
 module.exports = tps;
