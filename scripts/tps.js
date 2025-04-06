@@ -57,7 +57,7 @@ async function executeUserTasks(cookie, configData) {
         for (const taskId of tasks) {
             const result = await getTask({ ...configData, flowId, task: id, taskId, token: cookie });
             console.log(result);
-            msg += result;
+            msg += (result + '\n');
             await new Promise(resolve => setTimeout(resolve, 2000));
         }
     }
