@@ -35,12 +35,12 @@ async function getTask({ flowId, task, taskId, token, agent, url, e_code, eas_ur
         });
         if (response.status === 200) {
             return response.data.ret === "0"
-               ? `${task}${taskId}领取成功\n`
-                : `${task}${taskId}领取失败,原因：${response.data.msg}\n`;
+               ? `${task}${taskId}领取成功`
+                : `${task}${taskId}领取失败,原因：${response.data.msg}`;
         }
-        return `${task}${taskId}领取失败\n`;
+        return `${task}${taskId}领取失败`;
     } catch (error) {
-        return `${task}${taskId}领取失败，原因：${error.message}\n`;
+        return `${task}${taskId}领取失败，原因：${error.message}`;
     }
 }
 
