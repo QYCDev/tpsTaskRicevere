@@ -56,6 +56,7 @@ async function executeUserTasks(cookie, configData) {
     for (const { id, flowId, tasks } of taskTypes) {
         for (const taskId of tasks) {
             const result = await getTask({ ...configData, flowId, task: id, taskId, token: cookie });
+            console.log(result);
             msg += result;
             await new Promise(resolve => setTimeout(resolve, 2000));
         }
@@ -73,7 +74,6 @@ async function tps() {
         console.log(`开始领取用户 ${i + 1} 的战令奖励`);
         const cookie = cookies[i];
         const userMsg = await executeUserTasks(cookie, configData);
-        console.log(userMsg);
         allMessages += `【用户 ${i + 1}】：` + userMsg + '\n';
     }
     return "【tps战令】：" + allMessages;
