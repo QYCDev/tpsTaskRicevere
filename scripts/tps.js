@@ -75,6 +75,7 @@ async function tps() {
         const cookie = cookies[i];
         const userMsg = await executeUserTasks(cookie, configData);
         allMessages += `【用户 ${i + 1}】：` + userMsg + '\n';
+        console.log("--------------------------------------------------\n");
     }
     return "【tps战令】：" + allMessages;
 }
