@@ -70,7 +70,7 @@ async function tps() {
     let allMessages = '';
 
     for (let i = 0; i < cookies.length; i++) {
-        console.log("开始领取用户 ${i + 1} 的战令奖励");
+        console.log(`开始领取用户 ${i + 1} 的战令奖励`);
         const cookie = cookies[i];
         const userMsg = await executeUserTasks(cookie, configData);
         console.log(userMsg);
