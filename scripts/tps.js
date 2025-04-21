@@ -2,13 +2,12 @@ const axios = require("axios");
 
 // 封装配置读取和请求 URL 生成
 function getConfig() {
-    const agent = config.UserAgent;
     const iActivityId = config.tps.iActivityId;
     const sSDID = config.tps.sSDID;
     const e_code = config.tps.ecode;
     const eas_url = config.tps.easurl;
     const url = `https://comm.ams.game.qq.com/ams/ame/amesvr?sServiceType=tps&iActivityId=${iActivityId}&sServiceDepartment=group_a&sSDID=${sSDID}`;
-    return { agent, iActivityId, sSDID, e_code, eas_url, url };
+    return { iActivityId, e_code, eas_url, url };
 }
 
 // 生成随机字符串
@@ -22,13 +21,13 @@ function generateRandomString(length = 6) {
 }
 
 // 封装任务请求逻辑
-async function getTask({ flowId, task, taskId, token, agent, url, e_code, eas_url }) {
+async function getTask({ flowId, task, taskId, token, useragent, iActivityId, e_code, eas_url, url }) {
     const randomTag = generateRandomString();
-    const postData = `sServiceType=tps&iActivityId=${config.tps.iActivityId}&sServiceDepartment=group_a&iFlowId=${flowId}&g_tk=1842395457&sMiloTag=AMS-tps-1219120114-${randomTag}-${config.tps.iActivityId}-${flowId}&e_code=${e_code}&g_code=0&eas_url=${eas_url}&eas_refer=${eas_url}&${task}=${taskId}`;
+    const postData = `sServiceType=tps&iActivityId=${iActivityId}&sServiceDepartment=group_a&iFlowId=${flowId}&g_tk=1842395457&sMiloTag=AMS-tps-1219120114-${randomTag}-${iActivityId}-${flowId}&e_code=${e_code}&g_code=0&eas_url=${eas_url}&eas_refer=${eas_url}&${task}=${taskId}`;
     try {
         const response = await axios.post(url, postData, {
             headers: {
-                'User-Agent': agent,
+                'User-Agent': useragent,
                 Cookie: token,
                 'referer': 'https://tps.qq.com/'
             },
@@ -45,7 +44,7 @@ async function getTask({ flowId, task, taskId, token, agent, url, e_code, eas_ur
 }
 
 // 执行单个用户的任务
-async function executeUserTasks(cookie, configData) {
+async function executeUserTasks(cookie, agent, configData) {
     let msg = '开始领取战令奖励\n';
     const taskTypes = [
         { id: 'taskRicevere', flowId: config.tps.iFlowId, tasks: config.tps.taskRicevere.split("&") },
@@ -55,7 +54,7 @@ async function executeUserTasks(cookie, configData) {
 
     for (const { id, flowId, tasks } of taskTypes) {
         for (const taskId of tasks) {
-            const result = await getTask({ ...configData, flowId, task: id, taskId, token: cookie });
+            const result = await getTask({ ...configData, flowId, task: id, taskId, token: cookie, useragent: agent });
             console.log(result);
             msg += (result + '\n');
             await new Promise(resolve => setTimeout(resolve, 2000));
@@ -66,6 +65,7 @@ async function executeUserTasks(cookie, configData) {
 
 // 主函数，处理多个用户
 async function tps() {
+    const agents = config.tps.useragents;
     const cookies = config.tps.cookies;
     const configData = getConfig();
     let allMessages = '';
@@ -73,7 +73,12 @@ async function tps() {
     for (let i = 0; i < cookies.length; i++) {
         console.log(`开始领取用户 ${i + 1} 的战令奖励`);
         const cookie = cookies[i];
-        const userMsg = await executeUserTasks(cookie, configData);
+        if(agents.length <= i){
+            console.log(`未配置第${i+1}个用户的useragent`);
+            continue;
+        }
+        const agent = agents[i];
+        const userMsg = await executeUserTasks(cookie, agent, configData);
         allMessages += `【用户 ${i + 1}】：` + userMsg + '\n';
         console.log("--------------------------------------------------\n");
     }
